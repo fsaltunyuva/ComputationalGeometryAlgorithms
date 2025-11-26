@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Main {
     public static void main(String[] args) {
         PrimitiveAlgorithms primitiveAlgorithms = new PrimitiveAlgorithms();
@@ -26,5 +29,17 @@ public class Main {
         Triangle triangle2 = new Triangle(new Point(1, 1), new Point(5, 1), new Point(3, 4)); // Triangle with vertices at (1, 1), (5, 1), (3, 4)
 
         System.out.println(primitiveAlgorithms.TriangleTriangleIntersection(triangle1, triangle2)); // Should return true (they intersect)
+
+        ArrayList<Point> points = new ArrayList<>(Arrays.asList(
+                new Point(0,0),
+                new Point(4,0),
+                new Point(4,3),
+                new Point(0,3),
+                new Point(2,1)
+        ));
+
+        ConvexHull naiveConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.Naive);
+
+        System.out.println(naiveConvexHull.hullEdges);
     }
 }

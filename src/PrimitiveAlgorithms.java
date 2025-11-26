@@ -85,8 +85,8 @@ public class PrimitiveAlgorithms {
         Direction o3 = Orientation(tri.c, tri.a, p);
 
         // If all orientations are the same (all left or all right), point is inside the triangle
-        boolean allLeft = o1 == Direction.LEFT && o2 == Direction.LEFT && o3 == Direction.LEFT;
-        boolean allRight = o1 == Direction.RIGHT && o2 == Direction.RIGHT && o3 == Direction.RIGHT;
+        boolean allLeft = o1 == Direction.Left && o2 == Direction.Left && o3 == Direction.Left;
+        boolean allRight = o1 == Direction.Right && o2 == Direction.Right && o3 == Direction.Right;
 
         return allLeft || allRight;
     }
@@ -96,7 +96,7 @@ public class PrimitiveAlgorithms {
         Vector u = new Vector(p, q);
         Vector v = new Vector(p, r);
 
-        return CrossProduct(u, v) > 0 ? Direction.LEFT : Direction.RIGHT;
+        return CrossProduct(u, v) > 0 ? Direction.Left : Direction.Right;
     }
 
     // Cross product of two vectors in 2D (returns scalar value)
