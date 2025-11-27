@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.*;
 
 public class ConvexHull {
     ArrayList<Point> points;
@@ -16,6 +16,9 @@ public class ConvexHull {
             case JarvisMarch:
                 //JarvisMarch();
                 // TODO: Jarvis March
+                break;
+            case GrahamScan:
+                GrahamScan();
                 break;
         }
     }
@@ -112,5 +115,36 @@ public class ConvexHull {
         }
 
         return lowestPoint;
+    }
+
+    private void GrahamScan(){
+        Point p_low = FindLowestPoint(points);
+
+        ArrayList<Point> pts = new ArrayList<>(points);
+        pts.remove(p_low);
+        RadialSortAroundPoint(p_low, pts);
+
+        Stack<Point> hull = new Stack<>();
+        hull.push(p_low);
+
+        for(Point p : pts){
+            hull.push(p);
+
+            while (hull.size() > 2 &&
+                    primitiveAlgorithms.Orientation(hull.get(hull.size() - 3), hull.get(hull.size() - 2), hull.get(hull.size() - 1)) == Direction.Right) {
+                hull.remove(hull.size() - 2);
+            }
+        }
+
+        hullVertices = new ArrayList<>(hull);
+    }
+
+    private ArrayList<Point> RadialSortAroundPoint(Point p, ArrayList<Point> points){
+        points.sort((a, b) -> {
+            double angleA = Math.atan2(a.y - p.y, a.x - p.x);
+            double angleB = Math.atan2(b.y - p.y, b.x - p.x);
+            return Double.compare(angleA, angleB);
+        });
+        return points;
     }
 }

@@ -38,7 +38,7 @@ public class Main {
                 new Point(2,1)
         ));
 
-        ConvexHull naiveConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.JarvisMarch);
+        ConvexHull naiveConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.GrahamScan);
 
         System.out.println(naiveConvexHull.hullVertices);
     }
