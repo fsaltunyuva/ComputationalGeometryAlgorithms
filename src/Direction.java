@@ -1,4 +1,5 @@
 public enum Direction{
     Left,
-    Right
+    Right,
+    Colinear
 }

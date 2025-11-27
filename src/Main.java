@@ -33,13 +33,17 @@ public class Main {
         ArrayList<Point> points = new ArrayList<>(Arrays.asList(
                 new Point(0,0),
                 new Point(4,1),
-                new Point(4,3),
-                new Point(0,3),
-                new Point(2,1)
+                new Point(3,3),
+                new Point(3,1)
         ));
 
-        ConvexHull naiveConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.GrahamScan);
-
+        ConvexHull naiveConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.Naive);
         System.out.println(naiveConvexHull.hullVertices);
+
+        ConvexHull jarvisConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.JarvisMarch);
+        System.out.println(jarvisConvexHull.hullVertices);
+
+        ConvexHull grahamConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.GrahamScan);
+        System.out.println(grahamConvexHull.hullVertices);
     }
 }

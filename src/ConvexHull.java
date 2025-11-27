@@ -2,19 +2,19 @@ import java.util.*;
 
 public class ConvexHull {
     ArrayList<Point> points;
-    public ArrayList<Segment> hullEdges = new ArrayList<>();
     public ArrayList<Point> hullVertices = new ArrayList<>();
     private PrimitiveAlgorithms primitiveAlgorithms = new PrimitiveAlgorithms();
 
     public ConvexHull(ArrayList<Point> points, ConvexHullConstructionAlgorithm algorithmChoice) {
         this.points = points;
+        hullVertices.clear();
 
         switch (algorithmChoice) {
             case Naive:
                 NaiveAlgorithm();
                 break;
             case JarvisMarch:
-                //JarvisMarch();
+                JarvisMarch();
                 // TODO: Jarvis March
                 break;
             case GrahamScan:
@@ -23,7 +23,10 @@ public class ConvexHull {
         }
     }
 
+    //region Naive Algorithm
     private void NaiveAlgorithm(){
+        HashSet<Point> hullPoints = new HashSet<>();
+
         for (int i = 0; i < points.size(); i++) {
             for (int j = 0; j < points.size(); j++) {
                 if (i == j) continue;
@@ -47,27 +50,31 @@ public class ConvexHull {
                 }
 
                 if (allLeft) {
-                    hullEdges.add(new Segment(pi, pj));
+                    hullPoints.add(pi);
+                    hullPoints.add(pj);
                 }
             }
         }
+        hullVertices = new ArrayList<>(hullPoints);
     }
+    //endregion
 
+    //region Jarvis March
     private void JarvisMarch(){
         Point p_low = FindLowestPoint(points);
-        Point initialNextPoint = new Point(p_low.x + 1, p_low.y); // Imaginary point (TODO: +1?)
+        Point previousPoint = new Point(p_low.x - 1, p_low.y);
         Point currentPoint = p_low;
 
-        Point p_next = FindMinimumAngleTurnPoint(currentPoint, initialNextPoint, points, p_low);
+        Point p_next = FindMinimumAngleTurnPoint(previousPoint, currentPoint, points, currentPoint);
 
         hullVertices.add(p_low);
         hullVertices.add(p_next);
 
-        Point previousPoint = p_low;
+        previousPoint = currentPoint;
         currentPoint = p_next;
 
         while(true){
-            p_next = FindMinimumAngleTurnPoint(previousPoint, currentPoint, points, p_next);
+            p_next = FindMinimumAngleTurnPoint(previousPoint, currentPoint, points, currentPoint);
             if (p_next.equals(p_low)) break;
             hullVertices.add(p_next);
             previousPoint = currentPoint;
@@ -76,7 +83,7 @@ public class ConvexHull {
     }
 
     private Point FindMinimumAngleTurnPoint(Point previousPoint, Point currentPoint, ArrayList<Point> points, Point exclude){
-        float squaredMaxCosValue = Float.MIN_VALUE;
+        float minAngle = Float.MAX_VALUE;
         Point minAnglePoint = null;
 
         Vector pq = new Vector(previousPoint, currentPoint);
@@ -86,16 +93,12 @@ public class ConvexHull {
 
             Vector qr = new Vector(currentPoint, points.get(i));
 
-            // Sign of cosine
-            boolean dotProductSign = primitiveAlgorithms.DotProduct(pq, qr) > 0; // true if positive
+            float CosTheta = primitiveAlgorithms.DotProduct(pq, qr) / (pq.Magnitude() * qr.Magnitude());
 
-            // To avoid sqrt, we use squared cosθ
-            float squaredCosTheta = (float) Math.pow(primitiveAlgorithms.DotProduct(pq, qr), 2) / (pq.SquaredLength() * qr.SquaredLength());
+            float theta = (float) Math.acos(CosTheta);
 
-            if (!dotProductSign) squaredCosTheta *= -1;
-
-            if(squaredCosTheta > squaredMaxCosValue){
-                squaredMaxCosValue = squaredCosTheta;
+            if(theta < minAngle){
+                minAngle = theta;
                 minAnglePoint = points.get(i);
             }
         }
@@ -104,19 +107,18 @@ public class ConvexHull {
     }
 
     private Point FindLowestPoint(ArrayList<Point> points){
-        float min = Float.MAX_VALUE;
         Point lowestPoint = points.get(0);
-
-        for (int i = 0; i < points.size(); i++) {
-            if(points.get(i).y < min){
-                min = points.get(i).y;
-                lowestPoint = points.get(i);
+        for (Point p : points) {
+            if (p.y < lowestPoint.y ||
+                    (p.y == lowestPoint.y && p.x < lowestPoint.x)) {
+                lowestPoint = p;
             }
         }
-
         return lowestPoint;
     }
+//endregion
 
+    //region Graham Scan
     private void GrahamScan(){
         Point p_low = FindLowestPoint(points);
 
@@ -147,4 +149,5 @@ public class ConvexHull {
         });
         return points;
     }
+    //endregion
 }

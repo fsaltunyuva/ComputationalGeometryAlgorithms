@@ -96,7 +96,10 @@ public class PrimitiveAlgorithms {
         Vector u = new Vector(p, q);
         Vector v = new Vector(p, r);
 
-        return CrossProduct(u, v) > 0 ? Direction.Left : Direction.Right;
+        float result = CrossProduct(u, v);
+
+        if (result == 0) return Direction.Colinear;
+        return result > 0 ? Direction.Left : Direction.Right;
     }
 
     // Cross product of two vectors in 2D (returns scalar value)
@@ -105,7 +108,7 @@ public class PrimitiveAlgorithms {
     }
 
     public float DotProduct(Vector v1, Vector v2) {
-        return v1.x * v2.y + v1.y * v2.x;
+        return v1.x * v2.x + v1.y * v2.y;
     }
 
     // Convert segment to line
