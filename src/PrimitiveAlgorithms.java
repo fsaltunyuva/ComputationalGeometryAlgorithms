@@ -104,6 +104,10 @@ public class PrimitiveAlgorithms {
         return v1.x * v2.y - v1.y * v2.x;
     }
 
+    public float DotProduct(Vector v1, Vector v2) {
+        return v1.x * v2.y + v1.y * v2.x;
+    }
+
     // Convert segment to line
     public Line SegmentToLine(Segment segment) {
         float x1 = segment.start.x;

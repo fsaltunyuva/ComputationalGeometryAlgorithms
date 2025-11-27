@@ -14,4 +14,8 @@ public class Vector {
     public float Magnitude() {
         return (float) Math.sqrt(x * x + y * y);
     }
+
+    public float SquaredLength(){
+        return x * x + y * y;
+    }
 }
