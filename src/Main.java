@@ -58,6 +58,9 @@ public class Main {
         ConvexHull grahamConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.GrahamScan);
         System.out.println(grahamConvexHull.hullVertices);
 
+        ConvexHull chanConvexHull = new ConvexHull(points, ConvexHullConstructionAlgorithm.Chans);
+        System.out.println(chanConvexHull.hullVertices);
+
 
         // Sorting using Convex Hull
         ArrayList<Integer> numbersToBeSorted = new ArrayList<>(Arrays.asList(-4, 5, 3, 8, 1, -16, -3, 2));

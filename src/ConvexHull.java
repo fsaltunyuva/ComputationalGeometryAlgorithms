@@ -15,11 +15,15 @@ public class ConvexHull {
                 break;
             case JarvisMarch:
                 JarvisMarch();
-                // TODO: Jarvis March
                 break;
             case GrahamScan:
                 GrahamScan();
                 break;
+            case Chans:
+                ChansAlgorithm();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid Convex Hull Algorithm Choice");
         }
     }
 
@@ -143,6 +147,143 @@ public class ConvexHull {
             return Double.compare(angleA, angleB);
         });
         return points;
+    }
+    //endregion
+
+    //region Chan's Algorithm
+    // TODO: There may be issues in some inputs
+    private void ChansAlgorithm(){
+        hullVertices.clear();
+
+        for (int i = 0; i < 16; i++) {
+            int m = (int) Math.pow(2, Math.pow(2, i)); // m = 2^(2^i)
+            if (ChansAlgorithmStep(m)) break;
+        }
+    }
+
+    private boolean ChansAlgorithmStep(int m) {
+        hullVertices.clear();
+
+        int n = points.size();
+        ArrayList<Point> copiedPoints = new ArrayList<>(points);
+
+        // r = ceil(n / m)
+        int groupCount = (n + m - 1) / m;
+
+        ArrayList<ArrayList<Point>> groups = new ArrayList<>();
+
+        // Divide points into groups of size m
+        for (int g = 0; g < groupCount; g++) {
+            ArrayList<Point> group = new ArrayList<>();
+
+            // Determine start and end indices for the group
+            int start = g * m;
+            int end = Math.min(start + m, n);
+
+            // Add points to the group
+            for (int idx = start; idx < end; idx++) {
+                group.add(copiedPoints.get(idx));
+            }
+
+            // Add the group to the list of groups
+            if (!group.isEmpty()) {
+                groups.add(group);
+            }
+        }
+
+        ArrayList<ConvexHull> convexHulls = new ArrayList<>();
+
+        for (ArrayList<Point> group : groups)
+            convexHulls.add(new ConvexHull(group, ConvexHullConstructionAlgorithm.GrahamScan)); // Compute convex hull of the group
+
+        if(convexHulls.size() == 1){
+            hullVertices.clear();
+            hullVertices.addAll(convexHulls.get(0).hullVertices);
+            return true;
+        }
+
+        Point p_low = FindLowestPoint(points); // Starting point
+        Point previousPoint = new Point(p_low.x - 1, p_low.y); // Imaginary point to the left of p_low
+        Point currentPoint = p_low; // Current point on the hull
+
+        ArrayList<Point> currentTangentPoints = new ArrayList<>();
+
+        for(ConvexHull convexHull : convexHulls){
+            currentTangentPoints.add(BinarySearchTangentFromPoint(p_low, convexHull.hullVertices));
+        }
+
+        Point p_next = FindMinimumAngleTurnPoint(previousPoint, currentPoint, currentTangentPoints, currentPoint); // First hull point
+
+        // Add the first two hull points
+        hullVertices.add(p_low);
+        hullVertices.add(p_next);
+
+        previousPoint = currentPoint;
+        currentPoint = p_next;
+
+        int iterationCount = 0;
+
+        while(iterationCount < m){
+            currentTangentPoints.clear();
+            currentTangentPoints = new ArrayList<>();
+
+            for(ConvexHull convexHull : convexHulls){
+                currentTangentPoints.add(BinarySearchTangentFromPoint(currentPoint, convexHull.hullVertices));
+            }
+
+            p_next = FindMinimumAngleTurnPoint(previousPoint, currentPoint, currentTangentPoints, currentPoint); // Next hull point
+            if (p_next.equals(p_low)) return true; // Completed the hull
+            hullVertices.add(p_next); // Add next hull point
+
+            // Update previous and current points
+            previousPoint = currentPoint;
+            currentPoint = p_next;
+
+            iterationCount++;
+        }
+
+        // Did not complete hull within m steps
+        return false;
+    }
+
+    private Point BinarySearchTangentFromPoint(Point p, ArrayList<Point> hull) {
+        int n = hull.size();
+        if (n == 1) return hull.get(0);
+
+        // Calculate angles from point p to all hull points
+        float[] ang = new float[n];
+        for (int i = 0; i < n; i++) {
+            ang[i] = Angle(p, hull.get(i));
+        }
+
+        // Find the index of the minimum angle (rotation point) to start from the bitonic sequence
+        int start = 0;
+        for (int i = 1; i < n; i++) {
+            if (ang[i] < ang[start]) start = i;
+        }
+
+        // Binary search on the bitonic sequence to find the maximum angle (tangent point)
+        int low = 0, high = n - 1;
+        while (low < high) {
+            int mid = (low + high) / 2;
+
+            int midIdx  = (start + mid) % n;
+            int nextIdx = (start + mid + 1) % n;
+
+            if (ang[midIdx] < ang[nextIdx]) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+
+        int peakIdx = (start + low) % n;
+        return hull.get(peakIdx);
+    }
+
+    // TODO: Using orientation might be better
+    private float Angle(Point p1, Point p2){
+        return (float) Math.atan2(p2.y - p1.y, p2.x - p1.x);
     }
     //endregion
 
