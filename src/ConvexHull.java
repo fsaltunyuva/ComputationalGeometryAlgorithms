@@ -108,17 +108,6 @@ public class ConvexHull {
 
         return minAnglePoint; // Return the point with the minimum angle
     }
-
-    // Find the point with the lowest y-coordinate (and leftmost in case of the same y)
-    private Point FindLowestPoint(ArrayList<Point> points){
-        Point lowestPoint = points.get(0);
-        for (Point p : points) {
-            if (p.y < lowestPoint.y || (p.y == lowestPoint.y && p.x < lowestPoint.x)) {
-                lowestPoint = p;
-            }
-        }
-        return lowestPoint;
-    }
 //endregion
 
     //region Graham Scan
@@ -156,4 +145,15 @@ public class ConvexHull {
         return points;
     }
     //endregion
+
+    // Find the point with the lowest y-coordinate (and rightmost in case of degeneracy)
+    private Point FindLowestPoint(ArrayList<Point> points){
+        Point lowestPoint = points.get(0);
+        for (Point p : points) {
+            if (p.y < lowestPoint.y || (p.y == lowestPoint.y && p.x > lowestPoint.x)) {
+                lowestPoint = p;
+            }
+        }
+        return lowestPoint;
+    }
 }
